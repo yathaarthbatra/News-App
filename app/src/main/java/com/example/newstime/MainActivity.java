@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.C
 
         newsRecycler=findViewById(R.id.newsRecyclerView);
         categoryRecyler=findViewById(R.id.categoriesRecyclerView);
+        progressBar=findViewById(R.id.progressBar);
         articles=new ArrayList<>();
         categories=new ArrayList<>();
         newsAdapter=new NewsAdapter(articles,this);
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.C
         categoryRecyler.setAdapter(categoryAdapter);
         getCategories(); //initally our categories list was empty but after calling this
         //function the categories data set will get changed
+        getNews("All");
+        newsAdapter.notifyDataSetChanged();
 
     }
 
@@ -99,6 +102,17 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.C
                 //if the response if successful
                 NewsModel responseNewsModel=response.body();
                 progressBar.setVisibility(View.GONE); //as soon as we get the response
+                ArrayList<Articles> tempArticles=responseNewsModel.getArticles();
+                for(int i=0;i<tempArticles.size();i++){
+                    articles.add(
+                            new Articles(tempArticles.get(i).getTitle(),
+                                    tempArticles.get(i).getDescription(),
+                                    tempArticles.get(i).getUrlToImage(),
+                                    tempArticles.get(i).getUrl(),
+                                    tempArticles.get(i).getContent()));
+
+                }
+                newsAdapter.notifyDataSetChanged();
 
             }
 
@@ -112,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements CategoryAdapter.C
 
     @Override
     public void onCategoryClick(int position) {
+        String category=categories.get(position).getCategory();
+        getNews(category);
 
     }
 }
